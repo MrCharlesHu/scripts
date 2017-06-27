@@ -1,0 +1,36 @@
+#!/usr/bin/expect
+set timeout 20
+
+if { [llength $argv] < 1} {
+    puts "Usage:"
+    puts "$argv0 local_file remote_path"
+    exit 1
+}
+
+set local_file [lindex $argv 0]
+set remote_path root@122.224.131.186:/root/tomcat8/webapps
+set passwd 123456Pukka
+set passwderror 0
+
+spawn scp -P 50023 $local_file $remote_path
+
+expect {
+    "*assword:*" {
+        if { $passwderror == 1 } {
+            puts "passwd is error"
+            exit 2
+        }
+        set timeout 1000
+        set passwderror 1
+        send "$passwd\r"
+        exp_continue
+    }
+    "*es/no)?*" {
+        send "yes\r"
+        exp_continue
+    }
+    timeout {
+        puts "connect is timeout"
+        exit 3
+    }
+}
