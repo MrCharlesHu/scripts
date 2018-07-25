@@ -1,3 +1,4 @@
+# kubectl logs
 # kl groot api-gateway / kl groot api-gateway 2
 function kl() {
     local env=$1
@@ -11,6 +12,16 @@ function kl() {
     local cmd="${pods} | awk 'NR==${pod}{print;}' | xargs kubectl -n ${env} logs -f"
     printf "\e[1;32mCommand:\e[0m \e[1;46m${cmd}\e[0m\n"
     #echo "Command: ${cmd}"
+    eval $cmd
+}
+
+# kubectl delete 'Terminating' pod
+# kdp groot
+function kdp() {
+    local env=$1
+    printf "\e[1;32mEnvrioment:\e[0m \e[1;46m【${env}】\e[0m\n"
+    local cmd="kubectl get pods -n ${env} | grep Terminating | awk '{print \$1}' | xargs -t -I {} kubectl delete pods --grace-period=0 --force -n ${env} {}"
+    printf "\e[1;32mCommand:\e[0m \e[1;46m${cmd}\e[0m\n"
     eval $cmd
 }
 
